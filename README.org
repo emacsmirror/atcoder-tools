@@ -1,0 +1,11 @@
+#+title: emacs-atcoder-tools
+
+Compile and test your solution for an AtCoder contest problem, from Emacs.
+
+** Requirements
+   - Emacs 26 or higher
+   - [[https://github.com/kyuridenamida/atcoder-tools][atcoder-tools]]
+
+** Usage
+   - Run =atcoder-tools gen <contest_id>= to fetch metadata and test cases.
+   - Run =M-x atcoder-tools-test= on Emacs to test your solution using atcoder-tools.
