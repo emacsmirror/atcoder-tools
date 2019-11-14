@@ -60,6 +60,21 @@
     ))
 
 ;;;###autoload
+(defun atcoder-tools-browse-problem ()
+  (interactive)
+  (let* ((metadata-file-name (concat (file-name-directory (buffer-file-name))
+                                     "metadata.json"))
+         (metadata-alist (if (file-readable-p metadata-file-name)
+                             (json-read-file metadata-file-name)
+                           (error "Could not retrieve information from metadata.json.")))
+         (problem-alist (alist-get 'problem metadata-alist))
+         (contest-id (alist-get 'contest_id (alist-get 'contest problem-alist)))
+         (problem-id (alist-get 'problem_id problem-alist)))
+    (browse-url (format "https://atcoder.jp/contests/%s/tasks/%s"
+                        contest-id
+                        problem-id))))
+
+;;;###autoload
 (defun atcoder-tools-test ()
   (interactive)
   (let* ((input-file-name (buffer-file-name))
