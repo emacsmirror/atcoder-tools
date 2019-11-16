@@ -23,6 +23,9 @@
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
+
+;; Compile and test your solution for an AtCoder contest problem from Emacs.
+
 ;;; Code:
 
 (defgroup atcoder-tools nil
@@ -48,16 +51,14 @@
 (defun atcoder-tools--compile-command (mode input-file-name output-file-name)
   (pcase mode
     (`rust-mode (atcoder-tools--rust-compile-command input-file-name
-                                                     output-file-name))
-    ))
+                                                     output-file-name))))
 
 (defun atcoder-tools--test-command (mode input-file-name output-file-name)
   (pcase mode
     (`rust-mode (format "atcoder-tools test --exec=%s --dir=%s"
                         (shell-quote-argument output-file-name)
                         (shell-quote-argument
-                         (file-name-directory input-file-name))))
-    ))
+                         (file-name-directory input-file-name))))))
 
 ;;;###autoload
 (defun atcoder-tools-browse-problem ()
@@ -88,3 +89,5 @@
     (compile (format "%s && %s" compile-command test-command))))
 
 (provide 'atcoder-tools)
+
+;;; atcoder-tools.el ends here
