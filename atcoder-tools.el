@@ -34,7 +34,8 @@
   :group 'tools)
 
 (defcustom atcoder-tools-rust-use-rustup t
-  "If non-nil, compile Rust files using rustup.")
+  "If non-nil, compile Rust files using rustup."
+  :type 'bool)
 
 (defvar atcoder-tools--rust-version "1.15.1")
 
