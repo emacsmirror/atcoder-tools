@@ -1,4 +1,4 @@
-;;; atcoder-tools.el --- atcoder-tools client    -*- lexical-binding: t -*-
+;;; atcoder-tools.el --- An atcoder-tools client    -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2019 Seong Yong-ju
 
@@ -42,8 +42,7 @@
     (rust-rustc . ((cmd-templates . ("rustc -o %e %s" "env RUST_BACKTRACE=1 atcoder-tools test -e %e"))
                    (remove-exec . t)))
     (rust-rustup . ((cmd-templates . ("rustup run --install 1.15.1 rustc -o %e %s" "env RUST_BACKTRACE=1 atcoder-tools test -e %e"))
-                    (remove-exec . t)))
-    )
+                    (remove-exec . t))))
   "Run configurations.")
 
 (defvar atcoder-tools--buffer-name "*atcoder-tools*"
