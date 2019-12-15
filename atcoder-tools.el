@@ -6,7 +6,7 @@
 ;; Keywords: extensions, tools
 ;; URL: https://github.com/sei40kr/atcoder-tools
 ;; Package-Requires: ((emacs "26") (f "0.20") (s "1.12"))
-;; Version: 0.3.0
+;; Version: 0.3.1
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -44,13 +44,13 @@
 
 (defvar atcoder-tools--run-config-alist
   '(
-    (c-gcc . ((cmd-templates . ("gcc -x c -std=gnu11 -o %e -lm -O2 %s" "atcoder-tools test -e %e"))
+    (c-gcc . ((cmd-templates . ("gcc -x c -std=gnu11 -o %e -lm -O2 %s" "atcoder-tools test -e %e -d %d"))
               (remove-exec . t)))
-    (c-clang . ((cmd-templates . ("clang -x c -lm -O2 -o %e %s" "atcoder-tools test -e %e"))
+    (c-clang . ((cmd-templates . ("clang -x c -lm -O2 -o %e %s" "atcoder-tools test -e %e -d %d"))
                 (remove-exec . t)))
-    (rust-rustc . ((cmd-templates . ("rustc -Oo %e %s" "env RUST_BACKTRACE=1 atcoder-tools test -e %e"))
+    (rust-rustc . ((cmd-templates . ("rustc -Oo %e %s" "env RUST_BACKTRACE=1 atcoder-tools test -e %e -d %d"))
                    (remove-exec . t)))
-    (rust-rustup . ((cmd-templates . ("rustup run --install 1.15.1 rustc -Oo %e %s" "env RUST_BACKTRACE=1 atcoder-tools test -e %e"))
+    (rust-rustup . ((cmd-templates . ("rustup run --install 1.15.1 rustc -Oo %e %s" "env RUST_BACKTRACE=1 atcoder-tools test -e %e -d %d"))
                     (remove-exec . t))))
   "Run configurations.")
 
@@ -70,13 +70,14 @@
      (_ (error "No run configuration found for %S" mode)))
    atcoder-tools--run-config-alist))
 
-(defun atcoder-tools--expand-cmd-templates (cmd-templates src-file-name exec-file-name)
+(defun atcoder-tools--expand-cmd-templates (cmd-templates working-directory src-file-name exec-file-name)
   "Expand each command in CMD-TEMPLATES, a list of command templates.
 
 %s in the template will be replaced with SRC-FILE-NAME.
 %e in the template will be replaced with EXEC-FILE-NAME."
   (mapcar #'(lambda (cmd-template)
-              (s-replace-all `(("%s" . ,(shell-quote-argument src-file-name))
+              (s-replace-all `(("%d" . ,(shell-quote-argument working-directory))
+                               ("%s" . ,(shell-quote-argument src-file-name))
                                ("%e" . ,(shell-quote-argument exec-file-name)))
                              cmd-template))
           cmd-templates))
@@ -86,14 +87,16 @@
 
 MODE is the major mode of the solution buffer to test.
 SRC-FILE-NAME is the name of the solution file."
-  (let* ((run-config     (atcoder-tools--run-config-for-mode mode))
-         (exec-file-name (file-name-sans-extension src-file-name))
-         (cmd-templates  (alist-get 'cmd-templates run-config))
-         (commands       (atcoder-tools--expand-cmd-templates
-                          cmd-templates
-                          src-file-name
-                          exec-file-name))
-         (remove-exec    (alist-get 'remove-exec run-config nil)))
+  (let* ((run-config        (atcoder-tools--run-config-for-mode mode))
+         (working-directory (f-dirname src-file-name))
+         (exec-file-name    (file-name-sans-extension src-file-name))
+         (cmd-templates     (alist-get 'cmd-templates run-config))
+         (commands          (atcoder-tools--expand-cmd-templates
+                             cmd-templates
+                             working-directory
+                             src-file-name
+                             exec-file-name))
+         (remove-exec       (alist-get 'remove-exec run-config nil)))
     (with-current-buffer (get-buffer-create atcoder-tools--buffer-name)
       (read-only-mode -1)
       (erase-buffer)
