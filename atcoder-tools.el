@@ -1,13 +1,12 @@
-;; -*- lexical-binding: t -*-
-;;; atcoder-tools.el --- atcoder-tools client
+;;; atcoder-tools.el --- atcoder-tools client    -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2019 Seong Yong-ju
 
 ;; Author: Seong Yong-ju <sei40kr@gmail.com>
 ;; Keywords: extensions, tools
 ;; URL: https://github.com/sei40kr/atcoder-tools
-;; Package-Requires: ((emacs "26"))
-;; Version: 0.1.0
+;; Package-Requires: ((emacs "26") (f "0.20") (s "1.12"))
+;; Version: 0.2.0
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -24,7 +23,7 @@
 
 ;;; Commentary:
 
-;; Compile and test your solution for an AtCoder contest problem from Emacs.
+;; Test your solution for an AtCoder's task from Emacs.
 
 ;;; Code:
 
@@ -34,41 +33,73 @@
   :group 'tools)
 
 (defcustom atcoder-tools-rust-use-rustup t
-  "If non-nil, compile Rust files using rustup."
+  "If non-nil, Rustup is used to compile Rust code."
   :type 'bool)
 
-(defvar atcoder-tools--rust-version "1.15.1")
 
-(defun atcoder-tools--rust-compile-command (input-file-name output-file-name)
-  (if atcoder-tools-rust-use-rustup
-      (format "rustup run --install %s rustc -o %s %s"
-              (shell-quote-argument atcoder-tools--rust-version)
-              (shell-quote-argument output-file-name)
-              (shell-quote-argument input-file-name))
-    (format "rustc -o %s %s"
-            (shell-quote-argument output-file-name)
-            (shell-quote-argument input-file-name))))
+(defvar atcoder-tools--run-config-alist
+  '(
+    (rust-rustc . ((cmd-templates . ("rustc -o %e %s" "env RUST_BACKTRACE=1 atcoder-tools test -e %e"))
+                   (remove-exec . t)))
+    (rust-rustup . ((cmd-templates . ("rustup run --install 1.15.1 rustc -o %e %s" "env RUST_BACKTRACE=1 atcoder-tools test -e %e"))
+                    (remove-exec . t)))
+    )
+  "Run configurations.")
 
-(defun atcoder-tools--compile-command (mode input-file-name output-file-name)
-  (pcase mode
-    (`rust-mode (atcoder-tools--rust-compile-command input-file-name
-                                                     output-file-name))))
+(defvar atcoder-tools--buffer-name "*atcoder-tools*"
+  "The name of buffer where atcoder-tools outputs.")
 
-(defun atcoder-tools--test-command (mode input-file-name output-file-name)
-  (pcase mode
-    (`rust-mode (format "atcoder-tools test --exec=%s --dir=%s"
-                        (shell-quote-argument output-file-name)
-                        (shell-quote-argument
-                         (file-name-directory input-file-name))))))
+(defun atcoder-tools--run-config-for-mode (mode)
+  "Return an alist of run configuration for MODE."
+  (alist-get
+   (pcase mode
+     ('rust-mode (if atcoder-tools-rust-use-rustup 'rust-rustup 'rust-rustc))
+     (_ (error "No run configuration found for %S" mode)))
+   atcoder-tools--run-config-alist))
 
-;;;###autoload
-(defun atcoder-tools-browse-problem ()
-  (interactive)
-  (let* ((metadata-file-name (concat (file-name-directory (buffer-file-name))
-                                     "metadata.json"))
-         (metadata-alist (if (file-readable-p metadata-file-name)
+(defun atcoder-tools--expand-cmd-templates (cmd-templates src-file-name exec-file-name)
+  "Expand each command in CMD-TEMPLATES, a list of command templates.
+
+%s in the template will be replaced with SRC-FILE-NAME.
+%e in the template will be replaced with EXEC-FILE-NAME."
+  (mapcar #'(lambda (cmd-template)
+              (s-replace-all `(("%s" . ,(shell-quote-argument src-file-name))
+                               ("%e" . ,(shell-quote-argument exec-file-name)))
+                             cmd-template))
+          cmd-templates))
+
+(defun atcoder-tools--test (mode src-file-name)
+  "Internally called by `atcoder-tools-test'.
+
+MODE is the major mode of the solution buffer to test.
+SRC-FILE-NAME is the name of the solution file."
+  (let* ((run-config     (atcoder-tools--run-config-for-mode mode))
+         (exec-file-name (file-name-sans-extension src-file-name))
+         (cmd-templates  (alist-get 'cmd-templates run-config))
+         (commands       (atcoder-tools--expand-cmd-templates
+                          cmd-templates
+                          src-file-name
+                          exec-file-name))
+         (remove-exec    (alist-get 'remove-exec run-config nil)))
+    (with-current-buffer (get-buffer-create atcoder-tools--buffer-name)
+      (read-only-mode -1)
+      (erase-buffer)
+      (call-process-shell-command (s-join " && " commands) nil t)
+      (when remove-exec
+        (delete-file exec-file-name nil))
+      (goto-char (point-min))
+      (read-only-mode +1)
+      (let* ((win (selected-window)))
+        (pop-to-buffer (current-buffer))
+        (select-window win)))))
+
+(defun atcoder-tools--open-problem (metadata-file-name)
+  "Internally called by `atcoder-tools-open-problem'.
+
+METADATA-FILE-NAME is the path to metadata.json generated by atcoder-tools."
+  (let* ((metadata-alist (if (file-readable-p metadata-file-name)
                              (json-read-file metadata-file-name)
-                           (error "Could not retrieve information from metadata.json.")))
+                           (error "Could not retrieve information from metadata.json")))
          (problem-alist (alist-get 'problem metadata-alist))
          (contest-id (alist-get 'contest_id (alist-get 'contest problem-alist)))
          (problem-id (alist-get 'problem_id problem-alist)))
@@ -78,16 +109,18 @@
 
 ;;;###autoload
 (defun atcoder-tools-test ()
+  "Test your solution using atcoder-tools.
+
+An executable of the solution will be built if needed."
   (interactive)
-  (let* ((input-file-name (buffer-file-name))
-         (output-file-name (file-name-sans-extension (buffer-file-name)))
-         (compile-command (atcoder-tools--compile-command major-mode
-                                                          input-file-name
-                                                          output-file-name))
-         (test-command (atcoder-tools--test-command major-mode
-                                                    input-file-name
-                                                    output-file-name)))
-    (compile (format "%s && %s" compile-command test-command))))
+  (atcoder-tools--test major-mode buffer-file-name))
+
+;;;###autoload
+(defun atcoder-tools-open-problem ()
+  "Open the AtCoder's task page of current buffer in a web browser."
+  (interactive)
+  (atcoder-tools--open-problem (f-join (file-name-directory buffer-file-name)
+                                       "metadata.json")))
 
 (provide 'atcoder-tools)
 
