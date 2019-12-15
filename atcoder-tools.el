@@ -6,7 +6,7 @@
 ;; Keywords: extensions, tools
 ;; URL: https://github.com/sei40kr/atcoder-tools
 ;; Package-Requires: ((emacs "26") (f "0.20") (s "1.12"))
-;; Version: 0.2.0
+;; Version: 0.2.1
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -39,9 +39,9 @@
 
 (defvar atcoder-tools--run-config-alist
   '(
-    (rust-rustc . ((cmd-templates . ("rustc -o %e %s" "env RUST_BACKTRACE=1 atcoder-tools test -e %e"))
+    (rust-rustc . ((cmd-templates . ("rustc -Oo %e %s" "env RUST_BACKTRACE=1 atcoder-tools test -e %e"))
                    (remove-exec . t)))
-    (rust-rustup . ((cmd-templates . ("rustup run --install 1.15.1 rustc -o %e %s" "env RUST_BACKTRACE=1 atcoder-tools test -e %e"))
+    (rust-rustup . ((cmd-templates . ("rustup run --install 1.15.1 rustc -Oo %e %s" "env RUST_BACKTRACE=1 atcoder-tools test -e %e"))
                     (remove-exec . t))))
   "Run configurations.")
 
