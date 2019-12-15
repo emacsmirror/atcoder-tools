@@ -6,7 +6,7 @@
 ;; Keywords: extensions, tools
 ;; URL: https://github.com/sei40kr/atcoder-tools
 ;; Package-Requires: ((emacs "26") (f "0.20") (s "1.12"))
-;; Version: 0.2.1
+;; Version: 0.3.0
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -32,6 +32,11 @@
   :prefix 'atcoder-tools-
   :group 'tools)
 
+(defcustom atcoder-tools-c-compiler 'gcc
+  "The compiler to use to compile C code. Possible values are `gcc' and `clang'."
+  :type '(choice (const gcc)
+                 (const clang)))
+
 (defcustom atcoder-tools-rust-use-rustup t
   "If non-nil, Rustup is used to compile Rust code."
   :type 'bool)
@@ -39,6 +44,10 @@
 
 (defvar atcoder-tools--run-config-alist
   '(
+    (c-gcc . ((cmd-templates . ("gcc -x c -std=gnu11 -o %e -lm -O2 %s" "atcoder-tools test -e %e"))
+              (remove-exec . t)))
+    (c-clang . ((cmd-templates . ("clang -x c -lm -O2 -o %e %s" "atcoder-tools test -e %e"))
+                (remove-exec . t)))
     (rust-rustc . ((cmd-templates . ("rustc -Oo %e %s" "env RUST_BACKTRACE=1 atcoder-tools test -e %e"))
                    (remove-exec . t)))
     (rust-rustup . ((cmd-templates . ("rustup run --install 1.15.1 rustc -Oo %e %s" "env RUST_BACKTRACE=1 atcoder-tools test -e %e"))
@@ -52,6 +61,11 @@
   "Return an alist of run configuration for MODE."
   (alist-get
    (pcase mode
+     ('c-mode (pcase atcoder-tools-c-compiler
+                ('gcc 'c-gcc)
+                ('clang 'c-clang)
+                (_ (error "Invalid atcoder-tools-c-compiler value: %S"
+                          atcoder-tools-c-compiler))))
      ('rust-mode (if atcoder-tools-rust-use-rustup 'rust-rustup 'rust-rustc))
      (_ (error "No run configuration found for %S" mode)))
    atcoder-tools--run-config-alist))
