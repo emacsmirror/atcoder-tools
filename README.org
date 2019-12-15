@@ -13,5 +13,5 @@ Test your solution for an AtCoder's contest task from Emacs.
 ** Customization
    | Variable                        | Default value | Description                                                                   |
    |---------------------------------+---------------+-------------------------------------------------------------------------------|
-   | =atcoder-tools-c-compiler=      | ='gcc=        | The compiler to use to compile C code. Possible values are `gcc' and `clang'. |
+   | =atcoder-tools-c-compiler=      | =gcc=         | The compiler to use to compile C code. Possible values are =gcc= and =clang=. |
    | =atcoder-tools-rust-use-rustup= | =t=           | If non-nil, Rustup is used to compile Rust code.                              |
