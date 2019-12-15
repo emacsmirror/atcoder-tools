@@ -7,13 +7,8 @@ Test your solution for an AtCoder's contest task from Emacs.
    - [[https://github.com/kyuridenamida/atcoder-tools][atcoder-tools]]
 
 ** Usage
-   1. Run =atcoder-tools gen <contest_id>= in your shell to fetch metadata and test cases:
-
-      #+BEGIN_SRC sh
-        atcoder-tools gen abc123
-      #+END_SRC
-
-   2. Run =M-x atcoder-tools-test= on Emacs to test your solution using atcoder-tools.
+   1. Run =atcoder-tools gen <contest_id>= in your shell to fetch metadata and test cases.
+   1. Run =M-x atcoder-tools-test= on Emacs to test your solution using atcoder-tools.
 
 ** Customization
    | Variable                        | Default value | Description                                      |
