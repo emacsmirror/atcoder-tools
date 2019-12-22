@@ -6,6 +6,11 @@ Test your solution for an AtCoder's contest task from Emacs.
    - Emacs 26 or higher
    - [[https://github.com/kyuridenamida/atcoder-tools][atcoder-tools]]
 
+** Supported Languages
+   - C
+   - C++ (experimental, GCC only, no Boost support)
+   - Rust
+
 ** Usage
    1. Run =atcoder-tools gen <contest_id>= in your shell to fetch metadata and test cases.
    1. Run =M-x atcoder-tools-test= on Emacs to test your solution using atcoder-tools.
