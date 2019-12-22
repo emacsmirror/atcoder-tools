@@ -48,6 +48,9 @@
               (remove-exec . t)))
     (c-clang . ((cmd-templates . ("clang -x c -lm -O2 -o %e %s" "atcoder-tools test -e %e -d %d"))
                 (remove-exec . t)))
+    (c++-gcc . ((cmd-templates . ("g++ -std=gnu++1y -O2 -o %e %s"
+                                  "atcoder-tools test -e %e -d %d"))
+                (remove-exec . t)))
     (rust-rustc . ((cmd-templates . ("rustc -Oo %e %s" "env RUST_BACKTRACE=1 atcoder-tools test -e %e -d %d"))
                    (remove-exec . t)))
     (rust-rustup . ((cmd-templates . ("rustup run --install 1.15.1 rustc -Oo %e %s" "env RUST_BACKTRACE=1 atcoder-tools test -e %e -d %d"))
@@ -66,6 +69,7 @@
                 ('clang 'c-clang)
                 (_ (error "Invalid atcoder-tools-c-compiler value: %S"
                           atcoder-tools-c-compiler))))
+     ('c++-mode 'c++-gcc)
      ('rust-mode (if atcoder-tools-rust-use-rustup 'rust-rustup 'rust-rustc))
      (_ (error "No run configuration found for %S" mode)))
    atcoder-tools--run-config-alist))
