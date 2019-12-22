@@ -1,7 +1,7 @@
+// -*- atcoder-tools-rust-use-rustup: t -*-
 use std::cmp::min;
 
 // author: Seong Yong-ju <sei40kr@gmail.com>
-
 macro_rules! input {
     (source = $s:expr, $($r:tt)*) => {
         let mut iter = $s.split_whitespace();
