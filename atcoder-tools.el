@@ -6,7 +6,7 @@
 ;; Keywords: extensions, tools
 ;; URL: https://github.com/sei40kr/atcoder-tools
 ;; Package-Requires: ((emacs "26") (f "0.20") (s "1.12"))
-;; Version: 0.3.1
+;; Version: 0.3.2
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -26,6 +26,10 @@
 ;; Test your solution for an AtCoder's task from Emacs.
 
 ;;; Code:
+
+(require 'f)
+(require 'json)
+(require 's)
 
 (defgroup atcoder-tools nil
   "atcoder-tools client"
@@ -77,6 +81,7 @@
 (defun atcoder-tools--expand-cmd-templates (cmd-templates working-directory src-file-name exec-file-name)
   "Expand each command in CMD-TEMPLATES, a list of command templates.
 
+%d in the template will be replaced with WORKING-DIRECTORY.
 %s in the template will be replaced with SRC-FILE-NAME.
 %e in the template will be replaced with EXEC-FILE-NAME."
   (mapcar #'(lambda (cmd-template)
