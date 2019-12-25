@@ -1,5 +1,7 @@
 #+TITLE: emacs-atcoder-tools
 
+[[https://stable.melpa.org/#/atcoder-tools][file:https://stable.melpa.org/packages/atcoder-tools-badge.svg]]
+
 Test your solution for an AtCoder's contest task from Emacs.
 
 ** Requirements
