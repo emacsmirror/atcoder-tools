@@ -1,4 +1,4 @@
-// -*- atcoder-tools-c++-compiler: gcc -*-
+// -*- atcoder-tools-c++-compiler: clang -*-
 #include <iostream>
 #include <cstdlib>
 

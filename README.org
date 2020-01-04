@@ -10,7 +10,7 @@ Test your solution for an AtCoder's contest task from Emacs.
 
 ** Supported Languages
    - C
-   - C++ (experimental, GCC only, no Boost support)
+   - C++ (experimental, no Boost support)
    - Rust
 
 ** Usage
@@ -18,7 +18,8 @@ Test your solution for an AtCoder's contest task from Emacs.
    1. Run =M-x atcoder-tools-test= on Emacs to test your solution using atcoder-tools.
 
 ** Customization
-   | Variable                        | Default value | Description                                                                   |
-   |---------------------------------+---------------+-------------------------------------------------------------------------------|
-   | =atcoder-tools-c-compiler=      | =gcc=         | The compiler to use to compile C code. Possible values are =gcc= and =clang=. |
-   | =atcoder-tools-rust-use-rustup= | =t=           | If non-nil, Rustup is used to compile Rust code.                              |
+   | Variable                        | Default value | Description                                                                     |
+   |---------------------------------+---------------+---------------------------------------------------------------------------------|
+   | =atcoder-tools-c-compiler=      | =gcc=         | The compiler to use to compile C code. Possible values are =gcc= and =clang=.   |
+   | =atcoder-tools-c++-compiler=    | =gcc=         | The compiler to use to compile C++ code. Possible values are =gcc= and =clang=. |
+   | =atcoder-tools-rust-use-rustup= | =t=           | If non-nil, Rustup is used to compile Rust code.                                |
