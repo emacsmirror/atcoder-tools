@@ -6,7 +6,7 @@
 ;; Keywords: extensions, tools
 ;; URL: https://github.com/sei40kr/atcoder-tools
 ;; Package-Requires: ((emacs "26") (f "0.20") (s "1.12"))
-;; Version: 0.3.2
+;; Version: 0.4.1
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
