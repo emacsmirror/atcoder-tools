@@ -6,7 +6,7 @@
 ;; Keywords: extensions, tools
 ;; URL: https://github.com/sei40kr/atcoder-tools
 ;; Package-Requires: ((emacs "26") (f "0.20") (s "1.12"))
-;; Version: 0.4.1
+;; Version: 0.5.0
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -69,9 +69,6 @@
                     (remove-exec . t))))
   "Run configurations.")
 
-(defvar atcoder-tools--buffer-name "*atcoder-tools*"
-  "The name of buffer where atcoder-tools outputs.")
-
 (defun atcoder-tools--run-config-for-mode (mode)
   "Return an alist of run configuration for MODE."
   (alist-get
@@ -118,17 +115,10 @@ SRC-FILE-NAME is the name of the solution file."
                              src-file-name
                              exec-file-name))
          (remove-exec       (alist-get 'remove-exec run-config nil)))
-    (with-current-buffer (get-buffer-create atcoder-tools--buffer-name)
-      (read-only-mode -1)
-      (erase-buffer)
-      (call-process-shell-command (s-join " && " commands) nil t)
-      (when remove-exec
-        (delete-file exec-file-name nil))
-      (goto-char (point-min))
-      (read-only-mode +1)
-      (let* ((win (selected-window)))
-        (pop-to-buffer (current-buffer))
-        (select-window win)))))
+    (let ((comint-terminfo-terminal "ansi"))
+      (compile (s-join " && " commands) t))
+    (when remove-exec
+      (delete-file exec-file-name nil))))
 
 (defun atcoder-tools--open-problem (metadata-file-name)
   "Internally called by `atcoder-tools-open-problem'.
